@@ -1,134 +1,168 @@
-Job Tracker API
+# 📋 Job Tracker API
 
-Production-style REST API built with Spring Boot and PostgreSQL for tracking job applications.
+> A production-style REST API built with **Spring Boot** and **PostgreSQL** for tracking job applications from application through offer.
 
-Overview
+![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=flat-square&logo=spring-boot&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-C71A36?style=flat-square&logo=apache-maven&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
 
-This project is a backend service for managing job applications using a database-first approach. It emphasizes clean architecture, data integrity, and real-world backend development practices.
+---
 
-Tech Stack
-Java 21
-Spring Boot
-Spring Data JPA
-PostgreSQL
-Maven
-Architecture
+## 📖 Overview
 
-The application follows a layered architecture:
+Job Tracker API is a backend service for managing job applications using a **database-first approach**. It emphasizes clean architecture, data integrity, and real-world backend development practices — including schema validation, DTO separation, and centralized error handling.
 
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Java 21 |
+| Framework | Spring Boot |
+| ORM | Spring Data JPA (Hibernate) |
+| Database | PostgreSQL |
+| Build Tool | Maven |
+| Validation | Jakarta Validation |
+
+---
+
+## 🏗️ Architecture
+
+The application follows a strict **layered architecture**:
+
+```
 Controller → Service → Repository → Database
+```
 
-Key design decisions:
+**Key design decisions:**
 
-Database schema is manually defined
-Hibernate is configured in validate mode
-DTOs separate API contracts from entities
-Validation is enforced on incoming requests
-Centralized exception handling provides consistent error responses
-Database
+- 📌 Database schema is **manually defined** (no auto-generation)
+- 🔒 Hibernate runs in **`validate` mode** to enforce schema integrity
+- 📦 **DTOs** cleanly separate API contracts from internal entities
+- ✅ **Jakarta Validation** enforces constraints on all incoming requests
+- 🌐 **Centralized exception handling** delivers consistent JSON error responses
 
-Database name: jobtracker
+---
 
-Table name: job_applications
+## 🗄️ Database
 
-Key fields:
+**Database:** `jobtracker` &nbsp;|&nbsp; **Table:** `job_applications`
 
-id (BIGSERIAL PRIMARY KEY)
-company
-job_title
-status (APPLIED, INTERVIEWING, OFFER, REJECTED, WITHDRAWN)
-location
-salary
-date_applied
-job_url
-notes
-created_at
-updated_at
-API Endpoints
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `BIGSERIAL` | Primary key, auto-increment |
+| `company` | `VARCHAR` | Required |
+| `job_title` | `VARCHAR` | Required |
+| `status` | `ENUM` | `APPLIED` · `INTERVIEWING` · `OFFER` · `REJECTED` · `WITHDRAWN` |
+| `location` | `VARCHAR` | Optional |
+| `salary` | `NUMERIC` | Optional |
+| `date_applied` | `DATE` | Required |
+| `job_url` | `VARCHAR` | Optional |
+| `notes` | `TEXT` | Optional |
+| `created_at` | `TIMESTAMP` | Auto-set on insert |
+| `updated_at` | `TIMESTAMP` | Auto-set on update |
 
-Base URL:
+---
 
-http://localhost:8080/api/applications
+## 🔌 API Endpoints
 
-Get all applications:
+**Base URL:** `http://localhost:8080/api/applications`
 
-GET /api/applications
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/applications` | Retrieve all applications |
+| `GET` | `/api/applications/{id}` | Retrieve a single application |
+| `POST` | `/api/applications` | Create a new application |
+| `PUT` | `/api/applications/{id}` | Update an existing application |
+| `DELETE` | `/api/applications/{id}` | Delete an application |
 
-Get application by ID:
+---
 
-GET /api/applications/{id}
+## ✅ Validation
 
-Create application:
+All incoming requests are validated using **Jakarta Validation**. Violations return a structured `400 Bad Request` response:
 
-POST /api/applications
-
-Update application:
-
-PUT /api/applications/{id}
-
-Delete application:
-
-DELETE /api/applications/{id}
-
-Validation
-
-Requests are validated using Jakarta Validation.
-
-Validation rules include:
-
-Required fields enforced
-String length constraints
-Numeric validation for salary
-
-Example validation response:
-
+```json
 {
-"error": "Bad Request",
-"message": "Validation failed",
-"status": 400,
-"validationErrors": {
-"company": "Company must be between 1 and 150 characters",
-"status": "Status is required"
+  "error": "Bad Request",
+  "message": "Validation failed",
+  "status": 400,
+  "validationErrors": {
+    "company": "Company must be between 1 and 150 characters",
+    "status": "Status is required"
+  }
 }
-}
+```
 
-Error Handling
+**Enforced rules include:**
+- Required field presence
+- String length constraints
+- Numeric range validation for salary
 
-Global exception handling provides:
+---
 
-Consistent JSON error responses
-Proper HTTP status codes
-Clear error messages
-Configuration
+## ⚠️ Error Handling
 
-Key settings in application.properties:
+All errors return a consistent JSON structure with:
 
+- Appropriate **HTTP status codes**
+- Human-readable **error messages**
+- Field-level **validation details** where applicable
+
+---
+
+## ⚙️ Configuration
+
+Key settings in `application.properties`:
+
+```properties
+# Validate schema on startup — no auto-DDL changes
 spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.open-in-view=false
 
-Running the Application
+# Disable open session in view anti-pattern
+spring.jpa.open-in-view=false
+```
+
+---
+
+## 🚀 Running the Application
 
 From the project root:
 
-mvnw.cmd spring-boot:run
+```bash
+./mvnw spring-boot:run
+```
 
-Application starts on:
+> **Windows users:** use `mvnw.cmd spring-boot:run`
 
-http://localhost:8080
+The application will start at: **[http://localhost:8080](http://localhost:8080)**
 
-Current Status
-Fully functional CRUD API
-PostgreSQL integration
-DTO-based architecture
-Request validation
-Global exception handling
-Clean layered design
-Next Steps
-Add filtering and search endpoints
-Build React frontend
-Deploy backend to AWS
-Connect to AWS RDS
-Host frontend on S3 and CloudFront
-Author
+---
 
-Gregory Luna
+## 📊 Current Status
+
+- [x] Fully functional CRUD API
+- [x] PostgreSQL integration
+- [x] DTO-based architecture
+- [x] Request validation
+- [x] Global exception handling
+- [x] Clean layered design
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Filtering and search endpoints
+- [ ] React frontend
+- [ ] Deploy backend to AWS
+- [ ] Connect to AWS RDS
+- [ ] Host frontend on S3 + CloudFront
+
+---
+
+## 👤 Author
+
+**Gregory Luna**
